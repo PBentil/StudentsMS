@@ -1,0 +1,29 @@
+# Build output
+bin/
+obj/
+
+# Visual Studio files
+.vs/
+
+# Rider files
+.idea/
+
+# User specific files
+*.user
+*.suo
+
+# Logs
+*.log
+
+# Environment variables
+.env
+
+# OS files
+.DS_Store
+
+# Database files
+*.db
+*.sqlite
+
+# Generated files
+TestResults/
