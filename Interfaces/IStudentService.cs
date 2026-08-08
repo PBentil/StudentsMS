@@ -1,20 +1,18 @@
 using StudentManagementApi.DTOs;
-using StudentManagementApi.Models;
 
 namespace StudentManagementApi.Interfaces;
 
-
 public interface IStudentService
 {
-    List<StudentResponseDto> GetStudents();
+    Task<List<StudentResponseDto>> GetStudentsAsync();
 
-    StudentResponseDto AddStudent(CreateStudentDto dto);
+    Task<StudentResponseDto> AddStudentAsync(CreateStudentDto dto);
 
-    StudentResponseDto? GetStudentById(int id);
+    Task<StudentResponseDto?> GetStudentByIdAsync(int id);
 
-    StudentResponseDto? UpdateStudent(
+    Task<StudentResponseDto?> UpdateStudentAsync(
         int id,
         UpdateStudentDto dto);
 
-    bool DeleteStudent(int id);
+    Task<bool> DeleteStudentAsync(int id);
 }
