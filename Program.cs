@@ -3,6 +3,7 @@ using StudentManagementApi.Data;
 using StudentManagementApi.Interfaces;
 using StudentManagementApi.Services;
 using DotNetEnv;
+using StudentManagementApi.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,6 +34,8 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseHttpsRedirection();
 
