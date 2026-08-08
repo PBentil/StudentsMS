@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using StudentManagementApi.Data;
 using StudentManagementApi.DTOs;
 using StudentManagementApi.Interfaces;
@@ -14,9 +15,9 @@ public class StudentService : IStudentService
         this.context = context;
     }
 
-    public List<StudentResponseDto> GetStudents()
+    public async Task<List<StudentResponseDto>> GetStudentsAsync()
     {
-        return context.Students
+        return await context.Students
             .Select(student => new StudentResponseDto
             {
                 Id = student.Id,
@@ -25,10 +26,11 @@ public class StudentService : IStudentService
                 Age = student.Age,
                 Course = student.Course
             })
-            .ToList();
+            .ToListAsync();
     }
 
-    public StudentResponseDto AddStudent(CreateStudentDto dto)
+    public async Task<StudentResponseDto> AddStudentAsync(
+        CreateStudentDto dto)
     {
         var student = new Student
         {
@@ -39,7 +41,8 @@ public class StudentService : IStudentService
         };
 
         context.Students.Add(student);
-        context.SaveChanges();
+
+        await context.SaveChangesAsync();
 
         return new StudentResponseDto
         {
@@ -51,10 +54,10 @@ public class StudentService : IStudentService
         };
     }
 
-    public StudentResponseDto? GetStudentById(int id)
+    public async Task<StudentResponseDto?> GetStudentByIdAsync(int id)
     {
-        var student = context.Students
-            .FirstOrDefault(s => s.Id == id);
+        var student = await context.Students
+            .FirstOrDefaultAsync(s => s.Id == id);
 
         if (student == null)
         {
@@ -71,12 +74,12 @@ public class StudentService : IStudentService
         };
     }
 
-    public StudentResponseDto? UpdateStudent(
+    public async Task<StudentResponseDto?> UpdateStudentAsync(
         int id,
         UpdateStudentDto dto)
     {
-        var existingStudent = context.Students
-            .FirstOrDefault(s => s.Id == id);
+        var existingStudent = await context.Students
+            .FirstOrDefaultAsync(s => s.Id == id);
 
         if (existingStudent == null)
         {
@@ -88,7 +91,7 @@ public class StudentService : IStudentService
         existingStudent.Age = dto.Age;
         existingStudent.Course = dto.Course;
 
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         return new StudentResponseDto
         {
@@ -100,10 +103,10 @@ public class StudentService : IStudentService
         };
     }
 
-    public bool DeleteStudent(int id)
+    public async Task<bool> DeleteStudentAsync(int id)
     {
-        var student = context.Students
-            .FirstOrDefault(s => s.Id == id);
+        var student = await context.Students
+            .FirstOrDefaultAsync(s => s.Id == id);
 
         if (student == null)
         {
@@ -111,7 +114,8 @@ public class StudentService : IStudentService
         }
 
         context.Students.Remove(student);
-        context.SaveChanges();
+
+        await context.SaveChangesAsync();
 
         return true;
     }

@@ -16,17 +16,17 @@ public class StudentsController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetStudents()
+    public async Task<IActionResult> GetStudents()
     {
-        var students = studentService.GetStudents();
+        var students = await studentService.GetStudentsAsync();
 
         return Ok(students);
     }
 
     [HttpPost]
-    public IActionResult AddStudent(CreateStudentDto dto)
+    public async Task<IActionResult> AddStudent(CreateStudentDto dto)
     {
-        var newStudent = studentService.AddStudent(dto);
+        var newStudent = await studentService.AddStudentAsync(dto);
 
         return CreatedAtAction(
             nameof(GetStudentById),
@@ -36,9 +36,9 @@ public class StudentsController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public IActionResult GetStudentById(int id)
+    public async Task<IActionResult> GetStudentById(int id)
     {
-        var student = studentService.GetStudentById(id);
+        var student = await studentService.GetStudentByIdAsync(id);
 
         if (student == null)
         {
@@ -49,14 +49,12 @@ public class StudentsController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public IActionResult UpdateStudent(
+    public async Task<IActionResult> UpdateStudent(
         int id,
         UpdateStudentDto dto)
     {
-        var updatedStudent = studentService.UpdateStudent(
-            id,
-            dto
-        );
+        var updatedStudent =
+            await studentService.UpdateStudentAsync(id, dto);
 
         if (updatedStudent == null)
         {
@@ -67,9 +65,9 @@ public class StudentsController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public IActionResult DeleteStudent(int id)
+    public async Task<IActionResult> DeleteStudent(int id)
     {
-        var deleted = studentService.DeleteStudent(id);
+        var deleted = await studentService.DeleteStudentAsync(id);
 
         if (!deleted)
         {
