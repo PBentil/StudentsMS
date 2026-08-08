@@ -1,3 +1,4 @@
+using StudentManagementApi.DTOs;
 using StudentManagementApi.Models;
 
 namespace StudentManagementApi.Interfaces;
@@ -5,9 +6,15 @@ namespace StudentManagementApi.Interfaces;
 
 public interface IStudentService
 {
-    List<Student> GetStudents();    
-    Student AddStudent(Student student);
-    Student? GetByStudentById(int Id);
-    Student? UpdateStudent(int id, Student student);
-    bool? DeleteStudent(int id);
+    List<StudentResponseDto> GetStudents();
+
+    StudentResponseDto AddStudent(CreateStudentDto dto);
+
+    StudentResponseDto? GetStudentById(int id);
+
+    StudentResponseDto? UpdateStudent(
+        int id,
+        UpdateStudentDto dto);
+
+    bool DeleteStudent(int id);
 }

@@ -1,7 +1,7 @@
-using Microsoft.AspNetCore.Http.HttpResults;
 using StudentManagementApi.Data;
-using StudentManagementApi.Models;
+using StudentManagementApi.DTOs;
 using StudentManagementApi.Interfaces;
+using StudentManagementApi.Models;
 
 namespace StudentManagementApi.Services;
 
@@ -14,55 +14,105 @@ public class StudentService : IStudentService
         this.context = context;
     }
 
-    public List<Student> GetStudents()
+    public List<StudentResponseDto> GetStudents()
     {
-        return context.Students.ToList();
+        return context.Students
+            .Select(student => new StudentResponseDto
+            {
+                Id = student.Id,
+                StudentId = student.StudentId,
+                Name = student.Name,
+                Age = student.Age,
+                Course = student.Course
+            })
+            .ToList();
     }
 
-    public Student AddStudent(Student student)
+    public StudentResponseDto AddStudent(CreateStudentDto dto)
     {
+        var student = new Student
+        {
+            StudentId = dto.StudentId,
+            Name = dto.Name,
+            Age = dto.Age,
+            Course = dto.Course
+        };
+
         context.Students.Add(student);
-        
         context.SaveChanges();
-        return student;
+
+        return new StudentResponseDto
+        {
+            Id = student.Id,
+            StudentId = student.StudentId,
+            Name = student.Name,
+            Age = student.Age,
+            Course = student.Course
+        };
     }
 
-    public Student? GetByStudentById(int Id)
+    public StudentResponseDto? GetStudentById(int id)
     {
-        return context.Students.FirstOrDefault(s => s.Id == Id);
+        var student = context.Students
+            .FirstOrDefault(s => s.Id == id);
+
+        if (student == null)
+        {
+            return null;
+        }
+
+        return new StudentResponseDto
+        {
+            Id = student.Id,
+            StudentId = student.StudentId,
+            Name = student.Name,
+            Age = student.Age,
+            Course = student.Course
+        };
     }
 
-    public Student? UpdateStudent(int id, Student student)
+    public StudentResponseDto? UpdateStudent(
+        int id,
+        UpdateStudentDto dto)
     {
-        var existingStudent = context.Students.FirstOrDefault(s => s.Id == id);
+        var existingStudent = context.Students
+            .FirstOrDefault(s => s.Id == id);
 
         if (existingStudent == null)
         {
             return null;
         }
 
-        existingStudent.StudentId = student.StudentId;
-        existingStudent.Name = student.Name;
-        existingStudent.Age = student.Age;
-        existingStudent.Course = student.Course;
-        
+        existingStudent.StudentId = dto.StudentId;
+        existingStudent.Name = dto.Name;
+        existingStudent.Age = dto.Age;
+        existingStudent.Course = dto.Course;
+
         context.SaveChanges();
-        return existingStudent;
+
+        return new StudentResponseDto
+        {
+            Id = existingStudent.Id,
+            StudentId = existingStudent.StudentId,
+            Name = existingStudent.Name,
+            Age = existingStudent.Age,
+            Course = existingStudent.Course
+        };
     }
 
-    public bool? DeleteStudent(int id)
+    public bool DeleteStudent(int id)
     {
-        var student = context.Students.FirstOrDefault(s => s.Id == id);
+        var student = context.Students
+            .FirstOrDefault(s => s.Id == id);
 
         if (student == null)
         {
-            return null;
+            return false;
         }
-        
+
         context.Students.Remove(student);
         context.SaveChanges();
+
         return true;
-        
     }
-    
 }

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using StudentManagementApi.DTOs;
 using StudentManagementApi.Interfaces;
-using StudentManagementApi.Models;
 
 namespace StudentManagementApi.Controllers;
 
@@ -8,62 +8,74 @@ namespace StudentManagementApi.Controllers;
 [Route("api/[controller]")]
 public class StudentsController : ControllerBase
 {
-  private readonly IStudentService studentService;
-  
-  public StudentsController(IStudentService studentService)
-  {
-    this.studentService = studentService;
-  }
-  [HttpGet]
-  public IActionResult GetStudents()
-  {
-    var students = studentService.GetStudents();
-    return Ok(students);
-  }
+    private readonly IStudentService studentService;
 
-  [HttpPost]
-  public IActionResult AddStudent(Student student)
-  {
-    var newStudent = studentService.AddStudent(student);
-    return Ok(newStudent);
-  }
-
-  [HttpGet("{id}")]
-  public IActionResult GetStudentById(int id)
-  {
-    var student = studentService.GetByStudentById(id);
-
-    if (student == null)
+    public StudentsController(IStudentService studentService)
     {
-      return NotFound();
+        this.studentService = studentService;
     }
-    return Ok(student);
-  }
 
-  [HttpPut("{id}")]
-  public IActionResult UpdateStudent(int id, Student student)
-  {
-    var updatedStudent = studentService.UpdateStudent(id, student);
-
-    if (updatedStudent == null)
+    [HttpGet]
+    public IActionResult GetStudents()
     {
-      return NotFound();
+        var students = studentService.GetStudents();
+
+        return Ok(students);
     }
-    
-    return Ok(updatedStudent);
-  }
 
-  [HttpDelete("{id}")]
-  public IActionResult DeleteStudent(int id)
-  {
-    var student = studentService.DeleteStudent(id);
-    if (student == null)
+    [HttpPost]
+    public IActionResult AddStudent(CreateStudentDto dto)
     {
-      return NotFound();
+        var newStudent = studentService.AddStudent(dto);
+
+        return CreatedAtAction(
+            nameof(GetStudentById),
+            new { id = newStudent.Id },
+            newStudent
+        );
     }
-    return Ok(new
+
+    [HttpGet("{id}")]
+    public IActionResult GetStudentById(int id)
     {
-      message = "Student deleted successfully",
-    });
-  }
+        var student = studentService.GetStudentById(id);
+
+        if (student == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(student);
+    }
+
+    [HttpPut("{id}")]
+    public IActionResult UpdateStudent(
+        int id,
+        UpdateStudentDto dto)
+    {
+        var updatedStudent = studentService.UpdateStudent(
+            id,
+            dto
+        );
+
+        if (updatedStudent == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(updatedStudent);
+    }
+
+    [HttpDelete("{id}")]
+    public IActionResult DeleteStudent(int id)
+    {
+        var deleted = studentService.DeleteStudent(id);
+
+        if (!deleted)
+        {
+            return NotFound();
+        }
+
+        return NoContent();
+    }
 }
