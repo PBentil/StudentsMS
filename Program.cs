@@ -4,28 +4,37 @@ using StudentManagementApi.Interfaces;
 using StudentManagementApi.Services;
 using DotNetEnv;
 using StudentManagementApi.Middleware;
-
 var builder = WebApplication.CreateBuilder(args);
 
-// Register services
-builder.Services.AddControllers();
-
-// Load environment variables
 Env.Load();
 
-var connectionString =
-    $"Host={Environment.GetEnvironmentVariable("DB_HOST")};" +
-    $"Port={Environment.GetEnvironmentVariable("DB_PORT")};" +
-    $"Database={Environment.GetEnvironmentVariable("DB_NAME")};" +
-    $"Username={Environment.GetEnvironmentVariable("DB_USERNAME")};" +
-    $"Password={Environment.GetEnvironmentVariable("DB_PASSWORD")}";
+var testConnection =
+    Environment.GetEnvironmentVariable(
+        "ConnectionStrings__DefaultConnection"
+    );
 
+Console.WriteLine(
+    $"Connection string loaded: {!string.IsNullOrWhiteSpace(testConnection)}"
+);
+
+builder.Services.AddControllers();
+
+var connectionString =
+    Environment.GetEnvironmentVariable(
+        "ConnectionStrings__DefaultConnection"
+    );
+
+if (string.IsNullOrWhiteSpace(connectionString))
+{
+    throw new InvalidOperationException(
+        "Database connection string is not configured."
+    );
+}
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
 
 builder.Services.AddScoped<IStudentService, StudentService>();
 
-// Swagger / OpenAPI
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
