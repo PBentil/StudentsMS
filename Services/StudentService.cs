@@ -17,11 +17,16 @@ public class StudentService : IStudentService
         this.logger = logger;
     }
 
-    public async Task<List<StudentResponseDto>> GetStudentsAsync()
+    public async Task<PagedResponseDto<StudentResponseDto>> GetStudentsAsync(
+        int page,
+        int pageSize)
     {
-        logger.LogInformation("Retrieving all students.");
+        var totalRecords = await context.Students.CountAsync();
 
         var students = await context.Students
+            .OrderBy(student => student.Id)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .Select(student => new StudentResponseDto
             {
                 Id = student.Id,
@@ -32,12 +37,18 @@ public class StudentService : IStudentService
             })
             .ToListAsync();
 
-        logger.LogInformation(
-            "Retrieved {Count} students.",
-            students.Count
+        var totalPages = (int)Math.Ceiling(
+            (double)totalRecords / pageSize
         );
 
-        return students;
+        return new PagedResponseDto<StudentResponseDto>
+        {
+            Data = students,
+            Page = page,
+            PageSize = pageSize,
+            TotalRecords = totalRecords,
+            TotalPages = totalPages
+        };
     }
 
     public async Task<StudentResponseDto> AddStudentAsync(

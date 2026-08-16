@@ -4,7 +4,10 @@ namespace StudentManagementApi.Interfaces;
 
 public interface IStudentService
 {
-    Task<List<StudentResponseDto>> GetStudentsAsync();
+    Task<PagedResponseDto<StudentResponseDto>> GetStudentsAsync(
+        int page,
+        int pageSize
+    );
 
     Task<StudentResponseDto> AddStudentAsync(CreateStudentDto dto);
 
