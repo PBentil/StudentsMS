@@ -16,9 +16,14 @@ public class StudentsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetStudents()
+    public async Task<IActionResult> GetStudents(
+        int page = 1,
+        int pageSize = 10)
     {
-        var students = await studentService.GetStudentsAsync();
+        var students = await studentService.GetStudentsAsync(
+            page,
+            pageSize
+        );
 
         return Ok(students);
     }
