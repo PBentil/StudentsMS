@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text.Json;
+using StudentManagementApi.Exceptions;
 
 namespace StudentManagementApi.Middleware;
 
@@ -22,31 +23,52 @@ public class ExceptionMiddleware
         {
             await next(context);
         }
+        catch (UserAlreadyExistsException ex)
+        {
+            logger.LogWarning(
+                ex,
+                "User registration failed because the user already exists."
+            );
+
+            await HandleExceptionAsync(
+                context,
+                HttpStatusCode.BadRequest,
+                ex.Message
+            );
+        }
         catch (Exception ex)
         {
-            logger.LogError(ex, "An unhandled exception occurred.");
+            logger.LogError(
+                ex,
+                "An unhandled exception occurred."
+            );
 
-            await HandleExceptionAsync(context);
+            await HandleExceptionAsync(
+                context,
+                HttpStatusCode.InternalServerError,
+                "An unexpected error occurred."
+            );
         }
     }
 
     private static async Task HandleExceptionAsync(
-        HttpContext context)
+        HttpContext context,
+        HttpStatusCode statusCode,
+        string message)
     {
-        context.Response.StatusCode =
-            (int)HttpStatusCode.InternalServerError;
+        context.Response.StatusCode = (int)statusCode;
 
         context.Response.ContentType =
             "application/json";
 
         var response = new
         {
-            statusCode = 500,
-            message = "An unexpected error occurred."
+            statusCode = (int)statusCode,
+            message = message
         };
 
         await context.Response.WriteAsync(
             JsonSerializer.Serialize(response)
         );
     }
-}
+}   
